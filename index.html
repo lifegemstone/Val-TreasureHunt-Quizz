@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Val Surprise Quiz 💘</title>
+  <style>
+    :root{
+      --card-bg: rgba(255,255,255,0.14);
+      --card-border: rgba(255,255,255,0.22);
+      --text: #ffffff;
+      --accent: #ffffff;
+      --accentText: #ff3f78;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(circle at top left, #ff7aa2, #ff4f88 40%, #8b2cff);
+      color: var(--text);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 22px;
+    }
+    .app{
+      width:min(720px, 100%);
+    }
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:14px;
+    }
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 12px;
+      border-radius:999px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(10px);
+      font-weight:600;
+      font-size:14px;
+    }
+    .btn-mini{
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      color: var(--accent);
+      padding:10px 12px;
+      border-radius:999px;
+      cursor:pointer;
+      font-weight:700;
+      backdrop-filter: blur(10px);
+    }
+    .btn-mini:hover{ opacity:.92; }
+
+    .card{
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 20px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 18px 45px rgba(0,0,0,0.15);
+    }
+    h1{
+      margin: 0 0 6px 0;
+      font-size: 26px;
+      letter-spacing: .2px;
+    }
+    .sub{
+      margin:0 0 16px 0;
+      opacity:.92;
+      line-height:1.4;
+    }
+
+    .progress-wrap{
+      width:100%;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.22);
+      overflow:hidden;
+      margin: 12px 0 18px;
+    }
+    .progress{
+      height:100%;
+      width:0%;
+      background: rgba(255,255,255,0.88);
+      border-radius:999px;
+      transition: width .35s ease;
+    }
+
+    .qno{
+      font-weight:800;
+      opacity:.95;
+      margin-bottom:8px;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .question{
+      font-size: 18px;
+      font-weight:700;
+      line-height:1.35;
+      margin: 0 0 12px;
+    }
+    .hint{
+      margin: 0 0 14px;
+      opacity:.9;
+      font-size: 14px;
+      line-height: 1.35;
+    }
+    .answers{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .btn{
+      width:100%;
+      padding: 14px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.35);
+      background: rgba(255,255,255,0.92);
+      color: var(--accentText);
+      font-weight: 800;
+      font-size: 15px;
+      cursor:pointer;
+      transition: transform .08s ease, opacity .2s ease;
+      text-align:left;
+    }
+    .btn:hover{ opacity:.95; }
+    .btn:active{ transform: scale(0.99); }
+
+    .toast{
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(0,0,0,0.18);
+      border: 1px solid rgba(255,255,255,0.2);
+      font-weight:700;
+      line-height:1.35;
+      display:none;
+    }
+
+    .center{
+      text-align:center;
+    }
+    .big{
+      font-size: 20px;
+      font-weight: 900;
+      line-height: 1.35;
+      margin: 10px 0 6px;
+    }
+    .count{
+      font-size: 52px;
+      font-weight: 1000;
+      margin: 12px 0;
+      letter-spacing: 1px;
+    }
+    .final{
+      font-size: 18px;
+      font-weight: 800;
+      line-height: 1.5;
+      margin-top: 10px;
+    }
+    .muted{ opacity: .92; }
+    .footer-note{
+      margin-top: 14px;
+      font-size: 12px;
+      opacity: .85;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div class="badge" id="badge">💘 Val Surprise Quiz</div>
+      <button class="btn-mini" id="musicBtn" type="button">🎵 Music: Off</button>
+    </div>
+
+    <div class="card" id="card">
+      <h1 id="title">Hello 💝</h1>
+      <p class="sub" id="subtitle">Answer these 10 questions to unlock your surprise. No skipping 😉</p>
+
+      <div class="progress-wrap" aria-label="progress">
+        <div class="progress" id="progress"></div>
+      </div>
+
+      <div id="quizArea">
+        <div class="qno">
+          <span id="qIndex">1/10</span>
+          <span class="muted" id="warmth">Warmth: ❄️</span>
+        </div>
+        <p class="question" id="question">Loading…</p>
+        <p class="hint" id="hint"></p>
+        <div class="answers" id="answers"></div>
+        <div class="toast" id="toast"></div>
+      </div>
+
+      <div class="footer-note muted">
+        Tip: You can edit the questions in the code under <b>EDIT HERE</b>.
+      </div>
+    </div>
+
+    <!-- Optional audio: replace music.mp3 with your own file if you upload one -->
+    <audio id="bgm" loop>
+      <source src="music.mp3" type="audio/mpeg" />
+    </audio>
+
+  </div>
+
+<script>
+/* =========================
+   EDIT HERE (Personalize)
+   ========================= */
+const HER_NAME = "My Love"; // change to her name/nickname, e.g. "Kemi"
+const FINAL_CLUE_MAIN = "Go to where I park… 🚗";
+const FINAL_CLUE_REVEAL = "And check the TRUNK 💝"; // or make it a riddle if you prefer
+
+// Each question has: q (question), a (answers), after (message after she clicks), hint (optional)
+const quiz = [
+  { q: "What do I usually call you when I’m feeling extra soft? 😌",
+    a: ["My Love ❤️", "Madam CEO 😄", "Baby", "My person"],
+    hint: "Clue 1/10 — you’re starting strong…",
+    after: "Aww 😄 Okay… you’re warmed up. Keep going!"
+  },
+  { q: "Pick the date vibe I’d choose for us:",
+    a: ["Peace + quality time 💞", "Loud party", "Errands 😭", "Work meeting"],
+    hint: "Clue 2/10 — you’re getting warmer…",
+    after: "Correct energy 😌 — next one!"
+  },
+  { q: "What’s one thing I genuinely admire about you?",
+    a: ["Your heart ❤️", "Your strength 💪", "Your smile 😊", "All of the above 😍"],
+    hint: "Clue 3/10 — keep moving…",
+    after: "Facts. Now don’t stop 😄"
+  },
+  { q: "If I miss you, what do I usually do?",
+    a: ["Text/call you 📱", "Pretend I’m fine 😅", "Sleep", "Overthink quietly"],
+    hint: "Clue 4/10 — halfway soon…",
+    after: "You know me too well 👀"
+  },
+  { q: "Our relationship in one word is:",
+    a: ["Intentional ❤️", "Funny 😂", "Peaceful 😌", "Strong 💪"],
+    hint: "Clue 5/10 — you’re halfway!",
+    after: "Halfway! You’re doing amazing."
+  },
+  { q: "Pick the kind of surprise I’d plan:",
+    a: ["Thoughtful 💝", "Chaotic 😭", "Last-minute", "Confusing"],
+    hint: "Clue 6/10 — getting close…",
+    after: "Hehe… you’re getting closer."
+  },
+  { q: "When I’m proud of you, I usually:",
+    a: ["Say it clearly ✅", "Smile quietly 😊", "Start praising you 😄", "All of the above"],
+    hint: "Clue 7/10 — you’re almost there…",
+    after: "Yup. Now one more step."
+  },
+  { q: "Choose the best ‘us’ moment:",
+    a: ["Laughing together 😂", "Quiet talks 😌", "Random gist 😄", "All of it ❤️"],
+    hint: "Clue 8/10 — very close now…",
+    after: "Okay… now it’s getting serious 😌"
+  },
+  { q: "You make my life:",
+    a: ["Better ❤️", "More meaningful 💞", "Peaceful 😌", "All of the above 😍"],
+    hint: "Clue 9/10 — final one next…",
+    after: "Last question loading… 👀"
+  },
+  { q: "Final unlock: are you ready to claim your gift? 🎁",
+    a: ["YESSS 😍", "I think so 😄", "I’m shy 😭", "Let’s go 👀"],
+    hint: "Clue 10/10 — unlock time…",
+    after: "Okay. Deep breath…"
+  }
+];
+
+/* =========================
+   App Logic (don’t edit)
+   ========================= */
+let current = 0;
+let musicOn = false;
+
+const titleEl = document.getElementById("title");
+const badgeEl = document.getElementById("badge");
+const qIndexEl = document.getElementById("qIndex");
+const warmthEl = document.getElementById("warmth");
+const questionEl = document.getElementById("question");
+const hintEl = document.getElementById("hint");
+const answersEl = document.getElementById("answers");
+const toastEl = document.getElementById("toast");
+const progressEl = document.getElementById("progress");
+const quizArea = document.getElementById("quizArea");
+const musicBtn = document.getElementById("musicBtn");
+const bgm = document.getElementById("bgm");
+
+badgeEl.textContent = `💘 Val Surprise Quiz for ${HER_NAME}`;
+titleEl.textContent = `Hey ${HER_NAME} 💝`;
+
+musicBtn.addEventListener("click", async () => {
+  try{
+    if(!musicOn){
+      await bgm.play();
+      musicOn = true;
+      musicBtn.textContent = "🎵 Music: On";
+    }else{
+      bgm.pause();
+      musicOn = false;
+      musicBtn.textContent = "🎵 Music: Off";
+    }
+  }catch(e){
+    // Some phones require a user interaction (this click is one) but if file missing, it may fail.
+    alert("Music couldn’t play. If you want music, upload an mp3 named 'music.mp3' with this HTML.");
+  }
+});
+
+function warmthLabel(i){
+  if(i <= 1) return "Warmth: ❄️";
+  if(i <= 4) return "Warmth: 🌤️";
+  if(i <= 7) return "Warmth: 🔥";
+  return "Warmth: 🥵";
+}
+
+function setProgress(i){
+  const pct = Math.round((i / quiz.length) * 100);
+  progressEl.style.width = pct + "%";
+}
+
+function showToast(msg){
+  toastEl.style.display = "block";
+  toastEl.textContent = msg;
+}
+
+function clearToast(){
+  toastEl.style.display = "none";
+  toastEl.textContent = "";
+}
+
+function loadQuestion(){
+  clearToast();
+
+  qIndexEl.textContent = `${current+1}/${quiz.length}`;
+  warmthEl.textContent = warmthLabel(current);
+
+  questionEl.textContent = quiz[current].q;
+  hintEl.textContent = quiz[current].hint || "";
+
+  answersEl.innerHTML = "";
+  quiz[current].a.forEach(opt => {
+    const btn = document.createElement("button");
+    btn.className = "btn";
+    btn.textContent = opt;
+    btn.onclick = () => handleAnswer();
+    answersEl.appendChild(btn);
+  });
+
+  setProgress(current);
+}
+
+function handleAnswer(){
+  showToast(quiz[current].after || "Nice 😄");
+
+  // Small delay so she sees the message
+  setTimeout(() => {
+    current++;
+    if(current < quiz.length){
+      loadQuestion();
+    }else{
+      setProgress(quiz.length);
+      suspenseReveal();
+    }
+  }, 700);
+}
+
+function suspenseReveal(){
+  quizArea.innerHTML = `
+    <div class="center">
+      <div class="big">🎉 You unlocked it!</div>
+      <div class="muted">Preparing your final clue…</div>
+      <div class="count" id="countdown">3</div>
+      <div class="muted">No peeking 😄</div>
+    </div>
+  `;
+
+  let n = 3;
+  const cd = document.getElementById("countdown");
+  const timer = setInterval(() => {
+    n--;
+    cd.textContent = n;
+    if(n <= 0){
+      clearInterval(timer);
+      finalScreen();
+    }
+  }, 800);
+}
+
+function finalScreen(){
+  document.getElementById("card").innerHTML = `
+    <div class="center">
+      <h1>💝 Final Clue</h1>
+      <p class="sub">Okay ${HER_NAME}… you’ve earned this 😌</p>
+      <p class="final">
+        ${FINAL_CLUE_MAIN}<br/><br/>
+        <b style="font-size:22px;">${FINAL_CLUE_REVEAL}</b>
+      </p>
+      <p class="footer-note">Happy Valentine 💘</p>
+    </div>
+  `;
+}
+
+loadQuestion();
+</script>
+</body>
+</html>
